@@ -1,8 +1,8 @@
 import logger from '../logger';
-import * as morgan from 'morgan';
+import morgan from 'morgan';
 
 const stream = {
-  write: (message) => {
+  write: (message: string) => {
     logger.info(`${message.trim()}`);
   },
 };

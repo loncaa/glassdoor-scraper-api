@@ -27,7 +27,7 @@ const format = winston.format.combine(
 
 const transports = [new winston.transports.Console()];
 
-export function createLogger() {
+export function createLogger(): winston.Logger {
   return winston.createLogger({
     level: 'debug',
     levels,
