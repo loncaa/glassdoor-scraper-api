@@ -1,114 +1,109 @@
-import {
-  Education,
-  Experience,
-  LicenseOrCertificate,
-  GeneralInformation,
-} from '../../userProfile/userProfile.type';
+import puppeteer from 'puppeteer';
+import * as path from 'path';
+import * as cheerio from 'cheerio';
+import { createBrowser, createPuppeteerPage } from '../puppeteer.helper';
+import * as GlassDoorScraperHelper from './glassdoor.helper';
 
-const generalInfoLabelsMapping = ['title', 'location', 'email', 'website', 'phone'];
-export function scrapeUserGeneralInfo(sections, $: any): GeneralInformation {
-  const section = sections.eq(0);
-  const fullName = section.find('div[data-test="sectionHeader"] h3').text();
-  let response: GeneralInformation = { fullName };
+import logger from '../../../logger';
+import { UserProfile } from '../../userProfile/userProfile.type';
 
-  const general = section.find('div[class="col-12 col-sm-6 col-lg-4 p-0"]');
-  general.each((i, el) =>
-    $(el)
-      .find('div [class*="profileInfoStyle__wrap"]')
-      .each((z: number, elInner) => {
-        const label = generalInfoLabelsMapping[i * 2 + z]; //2 items per div
-        response[label] = $(elInner).text();
-      })
+const LOGIN_URL = 'https://www.glassdoor.com/profile/login_input.htm';
+const PROFILE_URL = 'https://www.glassdoor.com/member/profile/index.htm';
+
+async function loginToGlassDoorPage(
+  browser: puppeteer.Browser,
+  username: string,
+  password: string
+): Promise<puppeteer.Page> {
+  const page = await createPuppeteerPage(browser);
+  await page.goto(LOGIN_URL, {
+    waitUntil: 'networkidle0',
+  });
+
+  await page.type('#inlineUserEmail', username);
+  await page.type('#inlineUserPassword', password);
+
+  // click and wait for navigation
+  await page.click('#InlineLoginModule form button');
+  await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
+  return page;
+}
+
+async function getUserProfilePage(
+  browser: puppeteer.Browser,
+  cookies: puppeteer.Protocol.Network.CookieParam[]
+): Promise<puppeteer.Page> {
+  // Use cookies in another tab or browser
+  const pageUserProfile = await createPuppeteerPage(browser);
+  await pageUserProfile.setCookie(...cookies);
+  // Open the page as a logged-in user
+  await pageUserProfile.goto(PROFILE_URL, {
+    waitUntil: 'networkidle0',
+  });
+
+  return pageUserProfile;
+}
+
+export async function scrapeUserProfileData(username: string, password: string) {
+  const browser = await createBrowser();
+  const loginPage = await loginToGlassDoorPage(browser, username, password);
+
+  // Get cookies
+  const cookies = await loginPage.cookies();
+  await loginPage.close();
+
+  const userProfilePage = await getUserProfilePage(browser, cookies);
+
+  //click close button
+  try {
+    await userProfilePage.click(
+      '#ProfilePhoto div.profilePhotoBadge div.BadgeModalStyles__closeBtn___3Uha1'
+    );
+  } catch (err: any) {
+    logger.error(err.message);
+  }
+
+  //download resume
+  // @ts-ignore
+  await userProfilePage._client.send('Page.setDownloadBehavior', {
+    behavior: 'allow',
+    downloadPath: path.join(__dirname, '../../../../cvs'),
+  });
+  await userProfilePage.click(
+    '#ProfileInfo > div > div.d-flex.no-gutters.justify-content-center.align-items-start.profileInfoStyle__actions___3-CvK > div:nth-child(2) > button'
   );
 
-  return response;
-}
+  await userProfilePage.waitForXPath('//section/p');
 
-export function scrapeUserIntroduction(sections, $: any): string {
-  const section = sections.eq(1);
-  const about = section.find('p[data-test="description"]').text();
-  return about;
-}
-export function scrapeUserSkills(sections, $: any): string[] {
-  const section = sections.eq(3);
-  const skills = section.find('div[class*=skillsStyle__capitalize] div.css-zomrfc');
-  const response: string[] = [];
+  //retrieve page content and start scraping data
+  const pageContent = await userProfilePage.content(); //TODO not returning whole html content
+  const $ = cheerio.load(pageContent);
 
-  skills.each((_, el) => {
-    const skill = $(el).find('span').eq(0).text();
-    response.push(skill);
-  });
+  const sections = $('section');
+  const general = GlassDoorScraperHelper.scrapeUserGeneralInfo(sections, $);
+  const about = GlassDoorScraperHelper.scrapeUserIntroduction(sections, $);
+  const experiences = GlassDoorScraperHelper.scrapeUserExperience(sections, $);
+  const educations = GlassDoorScraperHelper.scrapeUserEducation(sections, $);
+  const skills = GlassDoorScraperHelper.scrapeUserSkills(sections, $);
+  const licenseesAndCertificates = GlassDoorScraperHelper.scrapeUserLicensesAndCertificates(
+    sections,
+    $
+  );
 
-  return response;
-}
+  const serializedFullName = general.fullName.trim().replace(/ /g, '_');
+  const response: UserProfile = {
+    general,
+    downloadUri: `/cv/${serializedFullName}.pdf`,
+    educations,
+    licenseesAndCertificates,
+    experiences,
+    about,
+    skills,
+  };
 
-export function scrapeUserExperience(sections, $: any): Experience[] {
-  const section = sections.eq(2);
-  const experiences = section.find('li[type="experience"]');
-  const response: Experience[] = [];
-
-  experiences.each((_, el) => {
-    const selector = $(el);
-    const title = selector.find('h3[data-test="title"]').text();
-    const company = selector.find('div[data-test="employer"] a').text();
-    const location = selector.find('label[data-test="location"]').text();
-    const period = selector.find('div[data-test="employmentperiod"]').text();
-    const description = selector.find('p[data-test="description"]').text();
-
-    response.push({
-      title,
-      company,
-      location,
-      period,
-      description,
-    });
-  });
-
-  return response;
-}
-
-export function scrapeUserEducation(sections, $: any): Education[] {
-  const section = sections.eq(4);
-  const experiences = section.find('li[type="education"]');
-  const response: Education[] = [];
-
-  experiences.each((_, el) => {
-    const selector = $(el);
-    const university = selector.find('h3[data-test="university"]').text();
-    const degree = selector.find('div[data-test="degree"]').text();
-    const location = selector.find('label[data-test="location"]').text();
-    const period = selector.find('div[data-test="graduationDate"]').text();
-
-    response.push({
-      degree,
-      university,
-      location,
-      period,
-    });
-  });
-
-  return response;
-}
-
-export function scrapeUserLicensesAndCertificates(sections, $: any): LicenseOrCertificate[] {
-  const section = sections.eq(5);
-  const experiences = section.find('li[type="certification"]');
-  const response: LicenseOrCertificate[] = [];
-
-  experiences.each((_, el) => {
-    const selector = $(el);
-    const title = selector.find('div[data-test="title"]').text();
-    const company = selector.find('div[data-test="employer"] a').text();
-    const period = selector.find('div[data-test="certificationperiod"]').text();
-    const description = selector.find('p[data-test="description"]').text();
-
-    response.push({
-      title,
-      company,
-      period,
-      description,
-    });
-  });
+  await userProfilePage.close();
+  await browser.close();
 
   return response;
 }
