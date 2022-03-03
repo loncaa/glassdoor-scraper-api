@@ -56,9 +56,13 @@ export async function fetchUserProfileData(username: string, password: string) {
   const userProfilePage = await getUserProfilePage(browser, cookies);
 
   //click close button
-  await userProfilePage.click(
-    '#ProfilePhoto div.profilePhotoBadge div.BadgeModalStyles__closeBtn___3Uha1'
-  );
+  try {
+    await userProfilePage.click(
+      '#ProfilePhoto div.profilePhotoBadge div.BadgeModalStyles__closeBtn___3Uha1'
+    );
+  } catch (err: any) {
+    logger.error(err.message);
+  }
 
   //download resume
   // @ts-ignore
@@ -72,18 +76,17 @@ export async function fetchUserProfileData(username: string, password: string) {
 
   await userProfilePage.waitForXPath('//section/p');
 
-  //await userProfilePage.screenshot({ path: path.join(__dirname, 'ss.png') });
-
   //retrieve page content and start scraping data
   const pageContent = await userProfilePage.content(); //TODO not returning whole html content
   const $ = cheerio.load(pageContent);
 
-  const general = GlassDoorScraper.scrapeUserGeneralInfo($);
-  const about = GlassDoorScraper.scrapeUserIntroduction($);
-  const experiences = GlassDoorScraper.scrapeUserExperience($);
-  const educations = GlassDoorScraper.scrapeUserEducation($);
-  const skills = GlassDoorScraper.scrapeUserSkills($);
-  const licenseesAndCertificates = GlassDoorScraper.scrapeUserLicensesAndCertificates($);
+  const sections = $('section');
+  const general = GlassDoorScraper.scrapeUserGeneralInfo(sections, $);
+  const about = GlassDoorScraper.scrapeUserIntroduction(sections, $);
+  const experiences = GlassDoorScraper.scrapeUserExperience(sections, $);
+  const educations = GlassDoorScraper.scrapeUserEducation(sections, $);
+  const skills = GlassDoorScraper.scrapeUserSkills(sections, $);
+  const licenseesAndCertificates = GlassDoorScraper.scrapeUserLicensesAndCertificates(sections, $);
 
   const serializedFullName = general.fullName.trim().replace(/ /g, '_');
   const response: UserData = {
@@ -99,7 +102,5 @@ export async function fetchUserProfileData(username: string, password: string) {
   await userProfilePage.close();
   await browser.close();
 
-  //const data = await scrapeUserProfilePageContent(userProfilePageContent);
-  //scrape user profile data
   return response;
 }
