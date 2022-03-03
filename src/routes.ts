@@ -1,7 +1,7 @@
 import * as express from 'express';
 
 import * as ParserRoutes from './components/scraper/scraper.routes';
-import * as UserProfileRoutes from './components/userProfile/usedProfile.routes';
+import * as UserProfileRoutes from './components/userProfile/userProfile.routes';
 
 const router = express.Router();
 
