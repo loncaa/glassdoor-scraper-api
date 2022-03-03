@@ -2,7 +2,7 @@ import * as GlassDoorService from './glassdoor/glassdoor.service';
 import express from 'express';
 import logger from '../../logger';
 
-export async function parseUserProfileDataController(
+export async function scrapeUserProfileDataController(
   req: express.Request,
   res: express.Response
 ): Promise<express.Response> {

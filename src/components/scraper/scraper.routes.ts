@@ -1,11 +1,10 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import * as parserController from './scraper.controller';
+import * as ParserController from './scraper.controller';
 
 const mapping = 'scraper';
 const router = express.Router();
 
-// @ts-ignore
-router.post('/glassdoor/user', asyncHandler(parserController.parseUserProfileDataController));
+router.post('/glassdoor/user', asyncHandler(ParserController.scrapeUserProfileDataController));
 
 export { router, mapping };
