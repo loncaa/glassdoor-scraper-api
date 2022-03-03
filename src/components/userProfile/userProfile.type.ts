@@ -31,7 +31,7 @@ export type GeneralInformation = {
   phoneNumber?: string;
 };
 
-export type UserData = {
+export type UserProfile = {
   general: GeneralInformation;
   about: string;
   experiences: Experience[];
