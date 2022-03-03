@@ -1,4 +1,9 @@
-import { Education, Experience, LicenseOrCertificate, GeneralInformation } from '../userData.type';
+import {
+  Education,
+  Experience,
+  LicenseOrCertificate,
+  GeneralInformation,
+} from '../../userProfile/userProfile.type';
 
 const generalInfoLabelsMapping = ['title', 'location', 'email', 'website', 'phone'];
 export function scrapeUserGeneralInfo(sections, $: any): GeneralInformation {

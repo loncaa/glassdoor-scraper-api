@@ -5,7 +5,7 @@ import { createBrowser, createPuppeteerPage } from '../puppeteer.helper';
 import * as GlassDoorScraper from './glassdoor.scraper';
 
 import logger from '../../../logger';
-import { UserData } from '../userData.type';
+import { UserProfile } from '../../userProfile/userProfile.type';
 
 const LOGIN_URL = 'https://www.glassdoor.com/profile/login_input.htm';
 const PROFILE_URL = 'https://www.glassdoor.com/member/profile/index.htm';
@@ -89,7 +89,7 @@ export async function fetchUserProfileData(username: string, password: string) {
   const licenseesAndCertificates = GlassDoorScraper.scrapeUserLicensesAndCertificates(sections, $);
 
   const serializedFullName = general.fullName.trim().replace(/ /g, '_');
-  const response: UserData = {
+  const response: UserProfile = {
     general,
     downloadUri: `/cv/${serializedFullName}.pdf`,
     educations,
