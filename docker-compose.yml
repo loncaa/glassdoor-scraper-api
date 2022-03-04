@@ -1,18 +1,22 @@
 # docker-compose.yml
-redis:
-  image: redis
-  container_name: queue
-  expose:
-    - 6379
-app:
-  build: ./
-  volumes:
-    - ./:/var/www/app
-  ports:
-    - 3001:3001
-  environment:
-    - REDIS_URL=redis://queue
-    - NODE_ENV=production
-    - PORT=3001
-  command:
-    sh -c 'npm start'
+version: '3.8'
+services:
+  redis:
+    image: redis
+    container_name: queue
+    expose:
+      - 6379
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - 3001:3001
+    environment:
+      - REDIS_URL=redis://queue
+      - NODE_ENV=production
+      - PORT=3001
+    command:
+      sh -c 'npm start'
