@@ -6,6 +6,8 @@ import { ScrapingStatus } from './scraperData.model';
 import * as ScraperDataRepository from './scraperData.repository';
 import * as UserDataRepository from '../userProfile/userProfile.repository';
 
+import Logger from '../../logger';
+
 const scraperQueue = new Queue('glassdoor scraper', process.env.REDIS_URL);
 
 scraperQueue.process(async function (job) {
@@ -15,7 +17,7 @@ scraperQueue.process(async function (job) {
 
 scraperQueue.on('failed', async function (job, err) {
   const { username } = job.data;
-  console.log(`Job ${job.id} failed ${JSON.stringify(err)}`);
+  Logger.error(`Job ${job.id} failed ${JSON.stringify(err)}`);
 
   const payload = {
     status: ScrapingStatus.FAILED,
