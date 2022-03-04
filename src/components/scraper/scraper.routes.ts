@@ -10,7 +10,7 @@ const mapping = 'scraper';
 const router = express.Router();
 
 router.post(
-  '/glassdoor/user',
+  '/glassdoor/userprofile',
   ValidatorMiddleware.validateBody(scraperSchema),
   // @ts-ignore
   asyncHandler(ParserController.scrapeUserProfileDataController)

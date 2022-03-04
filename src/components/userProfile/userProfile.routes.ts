@@ -6,7 +6,7 @@ import * as ValidatorMiddleware from '../../middleware/validator.middleware';
 
 import { userProfileSchema } from './userProfile.vschema';
 
-const mapping = 'user';
+const mapping = 'userprofile';
 const router = express.Router();
 
 router.get(
