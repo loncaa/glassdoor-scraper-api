@@ -11,12 +11,11 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./:/usr/src/app
+      - ./:/opt/app
     ports:
       - 3001:3001
     environment:
       - REDIS_URL=redis://queue
       - NODE_ENV=production
       - PORT=3001
-    command:
-      sh -c 'npm start'
+    command: npm start

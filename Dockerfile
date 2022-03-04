@@ -1,11 +1,18 @@
-FROM node:16-slim
+FROM node:alpine
+
+RUN apk add --no-cache \
+    udev \
+    ttf-freefont \
+    chromium
 
 ADD package*.json /tmp/package.json
 RUN cd /tmp && npm install
-RUN cp -a /tmp/node_modules /usr/src/app
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 
-WORKDIR /usr/src/app
-COPY . /usr/src/app
+WORKDIR /opt/app
+RUN chmod -R o+rwx node_modules/puppeteer/.local-chromium
+
+COPY . /opt/app
 
 EXPOSE 3000
 
