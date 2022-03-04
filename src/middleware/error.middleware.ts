@@ -27,7 +27,6 @@ export function handleErrors(
 ) {
   logger.error(err);
 
-  res
-    .status(err.status || StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ ok: false, message: err.message });
+  const status = err.status || StatusCodes.INTERNAL_SERVER_ERROR;
+  res.status(status).json({ statusCode: status, message: err.message });
 }
