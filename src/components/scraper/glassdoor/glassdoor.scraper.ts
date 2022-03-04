@@ -23,9 +23,18 @@ async function loginToGlassDoorPage(
   await page.type('#inlineUserEmail', username);
   await page.type('#inlineUserPassword', password);
 
-  // click and wait for navigation
   await page.click('#InlineLoginModule form button');
-  await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
+  await page.waitForNavigation({ waitUntil: 'networkidle2' });
+
+  // TODO make it working
+  const failed = await page.evaluate(() => {
+    const element = document.querySelector('#descriptionColor');
+    return element ? true : false;
+  });
+  if (failed) {
+    throw new Error(`Failed to login with username ${username}.`);
+  }
 
   return page;
 }
