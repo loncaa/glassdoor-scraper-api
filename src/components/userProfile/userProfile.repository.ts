@@ -14,6 +14,10 @@ export function createUserProfile(username: string, payload: UserProfile): UserP
 }
 
 export function uploadUserProfile(username, payload: UserProfileModel): UserProfileModel {
+  if (!InMemoryDatabase[username]) {
+    return null;
+  }
+
   const data = { ...InMemoryDatabase[username], ...payload };
   InMemoryDatabase[username] = data;
 
@@ -25,6 +29,10 @@ export function getUserProfile(username): UserProfileModel {
 }
 
 export function deleteUserProfile(username): UserProfileModel {
+  if (!InMemoryDatabase[username]) {
+    return null;
+  }
+
   const data = { ...InMemoryDatabase[username] };
   delete InMemoryDatabase[username];
 
