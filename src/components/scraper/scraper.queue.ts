@@ -19,6 +19,7 @@ scraperQueue.on('failed', async function (job, err) {
 
   const payload = {
     status: ScrapingStatus.FAILED,
+    message: err.message,
   };
   await ScraperDataRepository.updateScrapingData(username, payload);
 });

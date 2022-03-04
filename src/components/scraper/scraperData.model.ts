@@ -13,12 +13,14 @@ export const ScrapingStatus = {
 export type ScraperDataModel = {
   id: string;
   status: string;
+  message?: string;
   userProfile?: UserProfileModel;
   exp: number;
 };
 
 export type UpdateScraperData = {
   status?: string;
+  message?: string;
   userProfile?: UserProfileModel;
   exp?: number;
 };
