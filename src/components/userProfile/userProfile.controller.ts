@@ -4,6 +4,7 @@ import express from 'express';
 import logger from '../../logger';
 
 import * as UserProfileRepository from './userProfile.repository';
+import * as UserProfileService from './userProfile.service';
 
 /**
  *
@@ -33,7 +34,7 @@ export async function deleteUserProfileData(
 ): Promise<express.Response> {
   const { u: username } = req.query;
 
-  const profile = UserProfileRepository.deleteUserProfile(username);
+  const profile = UserProfileService.deleteUserProfile(username as string);
   if (!profile) {
     logger.info(`Profile with username ${username} not scraped jet.`);
 

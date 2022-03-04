@@ -28,7 +28,7 @@ export function getUserProfile(username): UserProfileModel {
   return InMemoryDatabase[username];
 }
 
-export function deleteUserProfile(username): UserProfileModel {
+export function removeUserProfile(username): UserProfileModel {
   if (!InMemoryDatabase[username]) {
     return null;
   }
