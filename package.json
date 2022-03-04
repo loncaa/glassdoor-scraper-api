@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development node --no-lazy -r ts-node/register ./src/server.ts",
-    "start:dev": "cross-env NODE_ENV=development nodemon --inspect-brk=0.0.0.0:5859 ./src/server.ts"
+    "start:dev": "cross-env NODE_ENV=development nodemon --inspect=0.0.0.0:5859 ./src/server.ts"
   },
   "author": "",
   "license": "ISC",
