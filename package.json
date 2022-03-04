@@ -4,6 +4,7 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
+    "start": "node --no-lazy -r ts-node/register ./src/server.ts",
     "start:dev": "nodemon --inspect=0.0.0.0:5859 ./src/server.ts"
   },
   "author": "",
