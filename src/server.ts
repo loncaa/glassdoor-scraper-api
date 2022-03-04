@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import path from 'path';
 import createError from 'http-errors';
 //import { StatusCodes } from 'http-status-codes';
@@ -10,6 +11,10 @@ import { router } from './routes';
 import { handleNoHttpErrors, handleErrors } from './middleware/error.middleware';
 import logger from './logger';
 import helmet from 'helmet';
+
+if (process.env['NODE_ENV'] === 'development') {
+  dotenv.config();
+}
 
 const port = process.env['PORT'] || 3001;
 

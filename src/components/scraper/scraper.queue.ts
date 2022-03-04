@@ -6,7 +6,7 @@ import { ScrapingStatus } from './scraperData.model';
 import * as ScraperDataRepository from './scraperData.repository';
 import * as UserDataRepository from '../userProfile/userProfile.repository';
 
-const scraperQueue = new Queue('glassdoor scraper');
+const scraperQueue = new Queue('glassdoor scraper', process.env.REDIS_URL);
 
 scraperQueue.process(async function (job) {
   const { username, password } = job.data;
