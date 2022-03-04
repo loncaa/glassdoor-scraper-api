@@ -1,2 +1,6 @@
+Dockerfile
+.dockerignore
 node_modules
-cvs/*
+npm-debug.log
+docker-compose.yaml
+cvs
