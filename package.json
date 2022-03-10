@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node --no-lazy -r ts-node/register ./src/server.ts",
-    "start:dev": "nodemon --inspect=0.0.0.0:5859 ./src/server.ts"
+    "start:prod:watch": "cross-env NODE_ENV=production nodemon --inspect=0.0.0.0:5859 ./src/server.ts",
+    "start:dev:watch": "nodemon --inspect=0.0.0.0:5859 ./src/server.ts"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "@types/puppeteer": "^5.4.5",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.4.0",
