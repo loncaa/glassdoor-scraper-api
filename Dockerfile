@@ -6,7 +6,7 @@ RUN apk add --no-cache \
     chromium
 
 ADD package*.json /tmp/package.json
-RUN cd /tmp && npm install
+RUN cd /tmp && npm ci --only=production
 RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 
 WORKDIR /opt/app/node_modules/puppeteer
@@ -18,4 +18,6 @@ COPY . /opt/app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+ENV NODE_ENV production
+
+CMD ["npm", "run", "start"]
